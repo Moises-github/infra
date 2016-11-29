@@ -1,0 +1,39 @@
+# instalar HTTPD e PHP - /play/apl.yml
+
+---
+
+- hosts: aplicacao
+  user: root
+  become: true
+  tasks:
+
+  - name: Instalar apache
+    yum: name=httpd
+    notify:
+
+  - name: Instalar PHP
+    yum: name="{{ item }}"
+    with_items:
+        - php
+        - php-common
+        - php-cli
+    notify:
+
+  - Nome: Copiar arquivo balanceamento
+    copy: src=~/play/app.php dest=/var/www/html/app.php owner=php mode=0644 force=yes backup=yes
+    notify:
+    
+  - name: Habilitar Apache
+    shell: systemctl enable httpd.service
+    notify:
+
+  - name: Iniciar Apache
+    shell: systemctl --type=service start httpd
+    notify:
+
+#  - Copiar arquivo balanceamento
+#    copy: src={{ item.src }} dest={{ item.dest }} owner=php mode=0644 force=yes backup=yes
+#    with_items:
+#      - { src: ~/play/app1.php, dest: 192.168.0.2/var/www/html/app1.php }
+#      - { src: ~/play/app2.php, dest: 192.168.0.3/var/www/html/app2.php }
+#    notify:

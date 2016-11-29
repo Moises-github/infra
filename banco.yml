@@ -1,0 +1,43 @@
+# instalar banco de dados Maridb - /play/banco.yml
+
+---
+
+---
+
+- hosts: banco_dados
+  user: root
+  become: yes
+  vars:
+    - dbname: wordpress
+    - dbuser: superlogin
+    - dbpass: 12345
+  tasks:
+
+  - name: instalar Mariadb
+    yum: name={{ item }} state=present update_cache=yes
+    with_items:
+        - mariadb-server
+        - mariadb
+        - MySQL-python.x86_64
+        - mariadb-libs.x86_64
+    notify:
+
+  - name: Habilitar Mariadb
+    shell: systemctl enable mariadb.service
+    notify:
+
+  - name: Iniciar Mariadb
+    shell: systemctl start mariadb.service
+    notify:
+
+  - name: Criar Administrator Mariadb
+    mysql_user: name={{ dbuser }} password={{ dbpass }} priv=*.*:ALL,GRANT host=192.168.0.2
+    notify:
+
+  - name: Criar banco Maridb
+    mysql_db: name={{ dbname }} state=present
+    notify:
+
+  - name: Reiniciar Mariadb
+    shell: systemctl --type=service restart mariadb
+    notify:
