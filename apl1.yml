@@ -1,0 +1,36 @@
+# Instalar HTTPD e PHP - /play/apl.yml
+
+---
+
+- hosts: aplicacao
+  user: root
+  become: true
+  tasks:
+
+  - name: Instalar apache
+    yum: name=httpd state=latest
+
+  - name: Instalar PHP
+    yum: name="{{ item }}"
+    with_items:
+        - php
+        - php-common
+        - php-cli
+
+  - name: Instalar Mysql-PHP
+    yum: name=php-mysql state=latest
+
+  - name: Copiar arquivo CRUD
+    copy: src={{ item.src }} dest={{ item.dest }} mode=0644 force=yes backup=yes
+    with_items:
+       - { src: ~/play/appapl/init.php, dest: /var/www/html/init.php }
+       - { src: ~/play/appapl/add.php, dest: /var/www/html/add.php }
+       - { src: ~/play/appapl/delete.php, dest: /var/www/html/delete.php }
+       - { src: ~/play/appapl/edit.php, dest: /var/www/html/edit.php }
+       - { src: ~/play/appapl/form-add.php, dest: /var/www/html/form-add.php }
+       - { src: ~/play/appapl/form-edit.php, dest: /var/www/html/form-edit.php }
+       - { src: ~/play/appapl/functions.php, dest: /var/www/html/functions.php }
+       - { src: ~/play/appapl/index.php, dest: /var/www/html/index.php }
+
+  - name: Iniciar Apache
+    service: name=httpd state=restarted enabled=yes

@@ -1,0 +1,33 @@
+# Instalar banco de dados Maridb - /play/banco.yml
+
+---
+
+- hosts: banco_dados
+  user: root
+  become: yes
+  vars:
+    - DB_HOST: banco_dados
+    - DB_USER: aplicacao
+    - DB_PASS: 12345
+    - DB_NAME: aula_dirceu
+  tasks:
+
+  - name: instalar Mariadb
+    yum: name={{ item }} state=latest
+    with_items:
+        - mariadb-server
+        - mariadb
+        - MySQL-python
+        - mariadb-libs
+
+  - name: start mariadb
+    service: name=mariadb state=started enabled=yes
+
+  - name: Criar Administrator Mariadb
+    mysql_user: name=DB_USER password=DB_PASS priv=*.*:ALL,GRANT state=present
+
+  - name: Copiar arquivo banco de dados
+    copy: src=~/play/appbanco/table.sql dest=/root/table.sql mode=0777 force=yes backup=yes
+
+  - name: Executar Script banco
+    mysql_db: state=import name=all target=/root/table.sql

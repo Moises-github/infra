@@ -1,0 +1,24 @@
+# instalar balanceador - /play/proxy.yml
+
+---
+
+- hosts: balanceador
+  user: root
+  become: true
+  tasks:
+
+  - name: Instalar EPEL
+    yum: name=epel-release state=latest
+
+
+  - name: Instalar NGINX
+    yum: name=nginx state=latest
+
+  - name: Copiar app.conf/nginx.conf
+    copy: src={{ item.src }} dest={{ item.dest }} owner=nginx mode=0644 force=yes backup=yes
+    with_items:
+      - { src: ~/play/appproxy/app.conf, dest: /etc/nginx/conf.d/app.conf }
+      - { src: ~/play/appproxy/nginx.conf, dest: /etc/nginx/nginx.conf }
+
+  - name: Habilitar e iniciar NGINX
+    service: name=nginx state=started enabled=yes
