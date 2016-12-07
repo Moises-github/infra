@@ -2,7 +2,7 @@
 
 ---
 
-- hosts: balanceador
+- hosts: balanceamento
   user: root
   become: true
   tasks:
