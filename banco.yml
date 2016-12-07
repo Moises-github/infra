@@ -2,9 +2,7 @@
 
 ---
 
----
-
-- hosts: banco_dados
+- hosts: banco
   user: root
   become: yes
   vars:
@@ -31,7 +29,7 @@
     notify:
 
   - name: Criar Administrator Mariadb
-    mysql_user: name={{ dbuser }} password={{ dbpass }} priv=*.*:ALL,GRANT host=192.168.0.2
+    mysql_user: name={{ dbuser }} password={{ dbpass }} priv=*.*:ALL,GRANT host=192.168.0.11
     notify:
 
   - name: Criar banco Maridb
